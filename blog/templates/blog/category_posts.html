@@ -1,0 +1,93 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ category.name }} — StreamBR{% endblock %}
+
+{% block content %}
+<section class="main-banner py-5">
+    <div class="container text-center">
+        <div class="d-inline-flex align-items-center justify-content-center p-3 rounded-circle mb-3" style="background:rgba(145, 70, 255, 0.15); border:1px solid var(--twitch); width:70px; height:70px;">
+            <i class="{{ category.icon }} text-twitch fs-2"></i>
+        </div>
+        <h1 class="banner-title mb-2">{{ category.name }}</h1>
+        {% if category.description %}
+        <p class="text-muted-custom mx-auto mb-0" style="max-width: 600px;">{{ category.description }}</p>
+        {% endif %}
+    </div>
+</section>
+
+<div class="container my-5">
+    <div class="row g-5">
+        <div class="col-lg-8">
+            <h2 class="section-title"><span class="dot"></span>Artigos em {{ category.name }}</h2>
+
+            {% if posts %}
+            <div class="row g-4">
+                {% for post in posts %}
+                <div class="col-md-6">
+                    <a href="{% url 'post_detail' post.slug %}" class="text-decoration-none d-block card-dark h-100">
+                        <div class="card-img-wrapper">
+                            <img src="{{ post.get_image }}" alt="{{ post.title }}" loading="lazy">
+                            <div class="card-img-overlay-gradient"></div>
+                            {% if post.featured %}
+                            <span class="featured-badge position-absolute top-0 start-0 m-2">
+                                <i class="bi bi-star-fill me-1"></i>Destaque
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="p-3">
+                            <h5 style="font-weight:700; color:var(--text-primary); font-size:1rem; line-height:1.35; margin-bottom:.5rem;">
+                                {{ post.title }}
+                            </h5>
+                            <p class="text-muted-custom mb-2" style="font-size:.82rem; line-height:1.5;">
+                                {{ post.content|truncatewords:18 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center pt-2" style="border-top:1px solid var(--dark-border);">
+                                <small class="text-muted-custom">
+                                    <i class="bi bi-person me-1"></i>{{ post.author.get_full_name|default:post.author.username }}
+                                </small>
+                                <small class="text-muted-custom">
+                                    <i class="bi bi-chat me-1"></i>{{ post.comments.count }}
+                                    &nbsp;·&nbsp;
+                                    {{ post.created_at|date:"d/m" }}
+                                </small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5" style="background:var(--dark-card); border:1px dashed var(--dark-border); border-radius:16px;">
+                <i class="bi bi-folder-x text-twitch display-3 mb-3 d-block"></i>
+                <h4>Nenhuma postagem nesta categoria ainda</h4>
+                <p class="text-muted-custom">Que tal ser a primeira pessoa a escrever sobre este assunto?</p>
+                {% if user.is_authenticated %}
+                <a href="{% url 'post_create' %}" class="btn-twitch mt-2">
+                    <i class="bi bi-pencil-square me-1"></i> Escrever Artigo
+                </a>
+                {% else %}
+                <a href="{% url 'register' %}" class="btn-twitch mt-2">
+                    <i class="bi bi-person-plus me-1"></i> Cadastre-se para postar
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sidebar-card">
+                <h6><i class="bi bi-grid me-2 text-twitch"></i>Outras Categorias</h6>
+                {% for cat in categories %}
+                <a href="{% url 'category_posts' cat.slug %}" class="category-pill {% if cat.slug == category.slug %}active text-light bg-dark{% endif %}">
+                    <span><i class="{{ cat.icon }} me-2 text-twitch"></i>{{ cat.name }}</span>
+                    <span class="count">{{ cat.posts.count }}</span>
+                </a>
+                {% endfor %}
+            </div>
+
+            <a href="{% url 'home' %}" class="btn-outline-twitch w-100 justify-content-center">
+                <i class="bi bi-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

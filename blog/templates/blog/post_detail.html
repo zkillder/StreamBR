@@ -1,0 +1,202 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ post.title }} — StreamBR{% endblock %}
+
+{% block content %}
+<!-- IMAGEM HERO DO POST -->
+<div style="height: 480px; position:relative; overflow:hidden;">
+    <img src="{{ post.get_image }}" alt="{{ post.title }}"
+         style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+    <div style="position:absolute; inset:0; background: linear-gradient(to top, var(--dark-bg) 20%, rgba(14,14,16,0.5) 70%, rgba(14,14,16,0.2) 100%);"></div>
+    <div style="position:absolute; bottom:0; left:0; right:0; padding:2.5rem 0;">
+        <div class="container">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                {% if post.featured %}
+                <span class="featured-badge"><i class="bi bi-star-fill me-1"></i>Destaque</span>
+                {% endif %}
+                {% if post.category %}
+                <a href="{% url 'category_posts' post.category.slug %}" class="category-badge">
+                    <i class="{{ post.category.icon }} me-1"></i>{{ post.category.name }}
+                </a>
+                {% endif %}
+            </div>
+            <h1 style="font-family:'Rajdhani',sans-serif; font-size:clamp(1.6rem,4vw,2.8rem); font-weight:700; color:white; text-shadow:0 2px 10px rgba(0,0,0,0.5); max-width:800px; line-height:1.2;">
+                {{ post.title }}
+            </h1>
+            <div class="d-flex flex-wrap align-items-center gap-3 mt-3" style="font-size:.88rem; color:var(--text-muted);">
+                <span>
+                    <i class="bi bi-person-circle me-1 text-twitch"></i>
+                    <strong style="color:var(--text-primary);">{{ post.author.get_full_name|default:post.author.username }}</strong>
+                </span>
+                <span><i class="bi bi-calendar3 me-1"></i>{{ post.created_at|date:"d \d\e N \d\e Y" }}</span>
+                <span><i class="bi bi-chat me-1"></i>{{ comments.count }} comentário{{ comments.count|pluralize }}</span>
+                {% if post.updated_at %}
+                <span><i class="bi bi-pencil me-1"></i>Atualizado em {{ post.updated_at|date:"d/m/Y" }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container my-5">
+    <div class="row g-5">
+
+        <!-- ══════ ARTIGO ══════ -->
+        <div class="col-lg-8">
+
+            <!-- Ações do Autor -->
+            {% if user == post.author or user.is_staff %}
+            <div class="d-flex gap-2 mb-4 p-3" style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:10px;">
+                <small class="text-muted-custom me-auto d-flex align-items-center">
+                    <i class="bi bi-shield-check me-2 text-twitch"></i>Você é o autor deste artigo
+                </small>
+                <a href="{% url 'post_edit' post.slug %}" class="btn-outline-twitch" style="font-size:.8rem; padding:.4rem .9rem;">
+                    <i class="bi bi-pencil"></i> Editar
+                </a>
+                <a href="{% url 'post_delete' post.slug %}" class="btn-outline-twitch" style="font-size:.8rem; padding:.4rem .9rem; border-color:var(--live-red); color:var(--live-red) !important;">
+                    <i class="bi bi-trash"></i> Excluir
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- Conteúdo -->
+            <div class="p-4 p-md-5" style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:16px; line-height:1.9; font-size:1.05rem; color:var(--text-primary);">
+                {{ post.content|linebreaks }}
+            </div>
+
+            <!-- TAGS/SHARE -->
+            <div class="d-flex justify-content-between align-items-center mt-4 p-3" style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:10px;">
+                <div class="d-flex gap-2">
+                    {% if post.category %}
+                    <a href="{% url 'category_posts' post.category.slug %}" class="category-badge">
+                        {{ post.category.name }}
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="text-muted-custom small">
+                    <i class="bi bi-share me-1"></i>Compartilhar
+                </div>
+            </div>
+
+            <!-- ══════ COMENTÁRIOS ══════ -->
+            <section class="mt-5">
+                <h3 class="section-title"><span class="dot"></span>{{ comments.count }} Comentário{{ comments.count|pluralize }}</h3>
+
+                <!-- Formulário de Comentário -->
+                {% if user.is_authenticated %}
+                <div class="mb-4 p-4" style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:12px;">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="avatar-circle">{{ user.username|first|upper }}</div>
+                        <form method="post" class="flex-grow-1">
+                            {% csrf_token %}
+                            {{ form.content }}
+                            <div class="d-flex justify-content-end mt-2">
+                                <button type="submit" class="btn-twitch" style="font-size:.875rem; padding:.5rem 1.25rem;">
+                                    <i class="bi bi-send"></i> Publicar Comentário
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <!-- LOGIN WALL para comentários -->
+                <div class="login-wall mb-4">
+                    <i class="bi bi-lock-fill text-twitch" style="font-size:2rem;"></i>
+                    <h5 class="mt-2 mb-1" style="font-family:'Rajdhani',sans-serif; font-weight:700;">Comentários exclusivos para membros</h5>
+                    <p class="text-muted-custom small mb-3">
+                        Faça login ou crie uma conta gratuita para comentar neste artigo e interagir com a comunidade.
+                    </p>
+                    <div class="d-flex justify-content-center gap-2 flex-wrap">
+                        <a href="{% url 'login' %}" class="btn-twitch">
+                            <i class="bi bi-box-arrow-in-right"></i> Entrar
+                        </a>
+                        <a href="{% url 'register' %}" class="btn-outline-twitch">
+                            <i class="bi bi-person-plus"></i> Criar Conta
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Lista de Comentários -->
+                {% for comment in comments %}
+                <div class="comment-item">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="avatar-circle">{{ comment.author.username|first|upper }}</div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <strong style="font-size:.9rem;">
+                                    {{ comment.author.get_full_name|default:comment.author.username }}
+                                </strong>
+                                <small class="text-muted-custom">{{ comment.created_at|date:"d/m/Y H:i" }}</small>
+                            </div>
+                            <p class="mb-0" style="font-size:.92rem; color:var(--text-muted);">{{ comment.content }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                {% if user.is_authenticated %}
+                <div class="text-center py-4 text-muted-custom">
+                    <i class="bi bi-chat-square display-5 d-block mb-2"></i>
+                    Nenhum comentário ainda. Seja o primeiro!
+                </div>
+                {% endif %}
+                {% endfor %}
+            </section>
+        </div>
+
+        <!-- ══════ SIDEBAR ══════ -->
+        <div class="col-lg-4">
+
+            <!-- Autor -->
+            <div class="sidebar-card">
+                <h6><i class="bi bi-person me-2 text-twitch"></i>Autor</h6>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="avatar-circle" style="width:50px;height:50px;font-size:1.2rem;">
+                        {{ post.author.username|first|upper }}
+                    </div>
+                    <div>
+                        <div style="font-weight:700;">{{ post.author.get_full_name|default:post.author.username }}</div>
+                        <small class="text-muted-custom">@{{ post.author.username }}</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA login (não-logados) -->
+            {% if not user.is_authenticated %}
+            <div class="sidebar-card" style="border-color:var(--twitch);">
+                <div class="text-center">
+                    <i class="bi bi-lock-fill text-twitch" style="font-size:1.8rem;"></i>
+                    <p class="text-muted-custom small my-2">Entre para comentar e publicar artigos.</p>
+                    <a href="{% url 'login' %}" class="btn-twitch w-100 justify-content-center mb-2">
+                        <i class="bi bi-box-arrow-in-right"></i> Entrar
+                    </a>
+                    <a href="{% url 'register' %}" class="btn-outline-twitch w-100 justify-content-center">
+                        <i class="bi bi-person-plus"></i> Criar Conta
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Artigos Relacionados -->
+            {% if related_posts %}
+            <div class="sidebar-card">
+                <h6><i class="bi bi-collection me-2 text-twitch"></i>Relacionados</h6>
+                {% for rel in related_posts %}
+                <a href="{% url 'post_detail' rel.slug %}" class="text-decoration-none d-flex gap-2 mb-3 pb-3" style="border-bottom:1px solid var(--dark-border);">
+                    <img src="{{ rel.get_image }}" alt="" style="width:70px; height:50px; object-fit:cover; border-radius:6px; flex-shrink:0;">
+                    <div>
+                        <div style="font-size:.85rem; font-weight:600; color:var(--text-primary); line-height:1.3;">{{ rel.title|truncatewords:8 }}</div>
+                        <small class="text-muted-custom">{{ rel.created_at|date:"d/m/Y" }}</small>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Voltar -->
+            <a href="{% url 'home' %}" class="btn-outline-twitch w-100 justify-content-center">
+                <i class="bi bi-arrow-left"></i> Voltar ao Início
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

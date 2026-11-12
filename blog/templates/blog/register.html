@@ -1,0 +1,81 @@
+{% extends 'blog/base.html' %}
+{% block title %}Criar Conta — StreamBR{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+            <!-- CABEÇALHO -->
+            <div class="text-center mb-4">
+                <div style="font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; color:var(--text-primary);">
+                    <span style="color:var(--twitch)">Stream</span>BR
+                </div>
+                <h2 class="mt-2 mb-1" style="font-family:'Rajdhani',sans-serif; font-weight:700;">Junte-se à Comunidade</h2>
+                <p class="text-muted-custom">Crie sua conta grátis e comece a publicar!</p>
+            </div>
+
+            <!-- BENEFÍCIOS -->
+            <div class="row g-2 mb-4">
+                <div class="col-4 text-center">
+                    <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:10px; padding:1rem 0.5rem;">
+                        <i class="bi bi-pencil-square text-twitch d-block mb-1" style="font-size:1.3rem;"></i>
+                        <small class="text-muted-custom" style="font-size:.75rem;">Publicar<br>Artigos</small>
+                    </div>
+                </div>
+                <div class="col-4 text-center">
+                    <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:10px; padding:1rem 0.5rem;">
+                        <i class="bi bi-chat-square-text text-twitch d-block mb-1" style="font-size:1.3rem;"></i>
+                        <small class="text-muted-custom" style="font-size:.75rem;">Comentar<br>Posts</small>
+                    </div>
+                </div>
+                <div class="col-4 text-center">
+                    <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:10px; padding:1rem 0.5rem;">
+                        <i class="bi bi-people text-twitch d-block mb-1" style="font-size:1.3rem;"></i>
+                        <small class="text-muted-custom" style="font-size:.75rem;">Entrar para<br>Comunidade</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORM CARD -->
+            <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:16px; overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#1a0533,#18181B); padding:1.5rem 2rem; border-bottom:1px solid var(--dark-border);">
+                    <h4 class="mb-0" style="font-family:'Rajdhani',sans-serif; font-weight:700;">
+                        <i class="bi bi-person-plus text-twitch me-2"></i>Criar Conta
+                    </h4>
+                </div>
+                <div class="p-4 p-md-5">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold" style="font-size:.88rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if field.help_text %}
+                            <div class="small mt-1" style="color:var(--text-muted);">{{ field.help_text }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn-twitch justify-content-center" style="font-size:1rem; padding:.85rem; border-radius:8px;">
+                                <i class="bi bi-check-circle me-2"></i>Criar Minha Conta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center py-3 px-4" style="border-top:1px solid var(--dark-border);">
+                    <span class="text-muted-custom small">Já tem conta?</span>
+                    <a href="{% url 'login' %}" style="color:var(--twitch); font-weight:600;" class="ms-1">Entrar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

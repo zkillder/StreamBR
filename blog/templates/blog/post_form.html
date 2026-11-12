@@ -1,0 +1,109 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{ action }} Artigo — StreamBR{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:16px; overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#1a0533,#18181B); padding:1.5rem 2rem; border-bottom:1px solid var(--dark-border);">
+                    <h3 class="mb-0" style="font-family:'Rajdhani',sans-serif; font-weight:700;">
+                        {% if action == 'Publicar' %}
+                        <i class="bi bi-pencil-square text-twitch me-2"></i>Novo Artigo sobre Streamers BR
+                        {% else %}
+                        <i class="bi bi-pencil text-twitch me-2"></i>Editar Artigo
+                        {% endif %}
+                    </h3>
+                </div>
+                <div class="p-4 p-md-5">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted-custom small text-uppercase">Título da Matéria</label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                            <div class="text-danger small mt-1">{{ form.title.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted-custom small text-uppercase">
+                                Slug (URL amigável) <small class="text-muted">(gerado automaticamente)</small>
+                            </label>
+                            {{ form.slug }}
+                            {% if form.slug.errors %}
+                            <div class="text-danger small mt-1">{{ form.slug.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row mb-3 g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-muted-custom small text-uppercase">Categoria / Streamer</label>
+                                {{ form.category }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold text-muted-custom small text-uppercase">URL da Imagem de Capa (Unsplash/Web)</label>
+                                {{ form.image_url }}
+                                {% if form.image_url.errors %}
+                                <div class="text-danger small mt-1">{{ form.image_url.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-muted-custom small text-uppercase">Conteúdo do Artigo</label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                            <div class="text-danger small mt-1">{{ form.content.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex gap-4 mb-4 p-3 rounded-3" style="background:var(--dark-bg); border:1px solid var(--dark-border);">
+                            <div class="form-check">
+                                {{ form.published }}
+                                <label class="form-check-label text-light" for="{{ form.published.id_for_label }}">
+                                    Publicar imediatamente
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                {{ form.featured }}
+                                <label class="form-check-label text-light" for="{{ form.featured.id_for_label }}">
+                                    Colocar em destaque na Home
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn-twitch">
+                                <i class="bi bi-check-lg"></i> {{ action }} Artigo
+                            </button>
+                            <a href="{% url 'home' %}" class="btn-outline-twitch">
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const titleInput = document.getElementById('id_title');
+    const slugInput = document.getElementById('id_slug');
+    if (titleInput && slugInput) {
+        titleInput.addEventListener('input', function() {
+            slugInput.value = this.value
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, '')
+                .trim()
+                .replace(/\s+/g, '-');
+        });
+    }
+</script>
+{% endblock %}

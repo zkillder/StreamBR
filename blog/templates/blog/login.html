@@ -1,0 +1,60 @@
+{% extends 'blog/base.html' %}
+{% block title %}Entrar — StreamBR{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="text-center mb-4">
+                <div style="font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700; color:var(--text-primary);">
+                    <span style="color:var(--twitch)">Stream</span>BR
+                </div>
+                <h2 class="mt-2 mb-1" style="font-family:'Rajdhani',sans-serif; font-weight:700;">Área de Membros</h2>
+                <p class="text-muted-custom">Faça login para postar e comentar</p>
+            </div>
+
+            <div style="background:var(--dark-card); border:1px solid var(--dark-border); border-radius:16px; overflow:hidden;">
+                <div style="background:linear-gradient(135deg,#1a0533,#18181B); padding:1.5rem 2rem; border-bottom:1px solid var(--dark-border);">
+                    <h4 class="mb-0" style="font-family:'Rajdhani',sans-serif; font-weight:700;">
+                        <i class="bi bi-box-arrow-in-right text-twitch me-2"></i>Entrar
+                    </h4>
+                </div>
+                <div class="p-4 p-md-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold" style="font-size:.88rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:.5px;">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in field.errors %}{{ error }}{% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2 small" style="background: #2e1a1a; border-left: 3px solid var(--live-red); color: var(--text-primary); border-radius:8px;">
+                            {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn-twitch justify-content-center" style="font-size:1rem; padding:.8rem; border-radius:8px;">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Entrar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center py-3 px-4" style="border-top:1px solid var(--dark-border); background: rgba(0,0,0,0.2);">
+                    <span class="text-muted-custom small">Ainda não tem conta?</span>
+                    <a href="{% url 'register' %}" style="color:var(--twitch); font-weight:600;" class="ms-1">Cadastrar-se</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
